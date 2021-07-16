@@ -1,0 +1,38 @@
+name: 'dbt_example_cycle_hire'
+version: '1.0.0'
+
+config-version: 2
+
+
+# Which context to use in profiles.yml
+profile: 'dev'
+
+
+# These configurations specify where dbt should look for different types of files
+# These don't typically change
+source-paths: ["models"]
+analysis-paths: ["analysis"]
+test-paths: ["tests"]
+data-paths: ["data"]
+macro-paths: ["macros"]
+
+
+# These don't typically change
+target-path: "target"  # directory which will store compiled SQL files
+clean-targets:         # directories to be removed by `dbt clean`
+    - "target"
+    - "dbt_modules"
+
+
+# Model confirguration
+seeds:
+  dbt_example_cycle_hire:
+    +enabled: true
+    +schema: raw_general
+    +column_types:
+      meta_delivery_time: timestamp
+    post-hook: "update {{ this }} set meta_delivery_time = {{dbt_macros.meta_process_time()}} where meta_delivery_time is null"
+
+#models:
+#  vars:
+#    scenario: 'A'
